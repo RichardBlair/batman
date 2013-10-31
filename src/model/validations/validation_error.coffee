@@ -2,16 +2,22 @@
 
 class Batman.ValidationError extends Batman.Object
 
-  formatErrorsForField = (allFailures, key, errorValues) ->
+  formatErrorsForField = (key, errorValues) =>
+    allFailures = ""
     if errorValues.length == 1
-      allFailures += "<li>#{key} " + errorValues.join(',') + "</li>"
+      allFailures += "<li class='#{@LI_ERROR_CLASS}'>#{key} " + errorValues.join(', ') + "</li>"
     else
-      allFailures += "<ul>"
+      allFailures += "<li class='#{ValidationError.LI_ERROR_CLASS}'>" + key
+      allFailures += "<ul class='#{@UL_ERROR_CLASS}'>"
       for error in errorValues
-        allFailures += "<li>" + error + "</li>"
+        allFailures += "<li class='#{@LI_ERROR_CLASS}'>" + error + "</li>"
       allFailures += "</ul>"
+      allFailures += '</li>'
 
     return allFailures
+
+  @UL_ERROR_CLASS = ""
+  @LI_ERROR_CLASS = ""
 
   @accessor 'fullMessage', ->
     if @attribute == 'base'
@@ -27,11 +33,14 @@ class Batman.ValidationError extends Batman.Object
         if Object.keys(@message).length == 1
           key = Object.keys(@message)[0]
           val = @message[key]
+          if val instanceof Array
+            val = val.join (", ")
+
           allFailures = key + " " + val
         else
-          allFailures = "<ul>"
+          allFailures = "<ul class='#{ValidationError.UL_ERROR_CLASS}'>"
           for key, val of @message
-            formatErrorsForField(allFailures, key, val)
+            allFailures += formatErrorsForField(key, val)
           allFailures += "</ul>"
 
 

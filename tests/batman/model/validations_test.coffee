@@ -478,9 +478,26 @@ test "ValidationError doesn't add 'base' to fullMessage", ->
   equal error.get('fullMessage'), "Model isn't valid"
 
 test "should display nested errors on one line, if there's only one problem", ->
-  error = new Batman.ValidationError('fooBarBaz', {
+  error = new Batman.ValidationError('orderCustomer', {
       email: ["isn't valid"]
     })
 
-  equal error.get('fullMessage'), "Foo bar baz email isn't valid"
+  equal error.get('fullMessage'), "Order customer email isn't valid"
 
+test "should display nested errors on one line, if there is only one field that has many problems", ->
+  error = new Batman.ValidationError('orderCustomer', {
+      email: ["isn't valid", "is improper", "is profane"]
+    })
+
+  equal error.get('fullMessage'), "Order customer email isn't valid, is improper, is profane"
+
+test "should display nested errors on multiple lines if there are multiple fields with multiple problems", ->
+  error = new Batman.ValidationError('orderCustomer', {
+      email: ["isn't valid", "is improper", "is profane"],
+      name: ["is clearly fraudulent"]
+    })
+
+  s1 = error.get('fullMessage').split(' ')
+  s2 = "Order customer <ul class=''><li class=''>email<ul class=''><li class=''>isn't valid</li><li class=''>is improper</li><li class=''>is profane</li></ul></li><li class=''>name is clearly fraudulent</li></ul>".split(' ')
+  deepEqual s1, s2
+  #equal error.get('fullMessage'), "Order customer <ul class=''><li class=''>email<ul class=''><li class=''>isn't valid</li><li class=''>is improper</li><li class=''>is profane</li></ul></li><li class=''>name is clearly fraudulent</li></ul>"
