@@ -476,3 +476,11 @@ test "ValidationError should humanize attribute in the full message", ->
 test "ValidationError doesn't add 'base' to fullMessage", ->
   error = new Batman.ValidationError('base', "Model isn't valid")
   equal error.get('fullMessage'), "Model isn't valid"
+
+test "should display nested errors on one line, if there's only one problem", ->
+  error = new Batman.ValidationError('fooBarBaz', {
+      email: ["isn't valid"]
+    })
+
+  equal error.get('fullMessage'), "Foo bar baz email isn't valid"
+
