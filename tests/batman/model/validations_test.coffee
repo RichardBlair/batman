@@ -500,4 +500,26 @@ test "should display nested errors on multiple lines if there are multiple field
   s1 = error.get('fullMessage').split(' ')
   s2 = "Order customer <ul class=''><li class=''>email<ul class=''><li class=''>isn't valid</li><li class=''>is improper</li><li class=''>is profane</li></ul></li><li class=''>name is clearly fraudulent</li></ul>".split(' ')
   deepEqual s1, s2
-  #equal error.get('fullMessage'), "Order customer <ul class=''><li class=''>email<ul class=''><li class=''>isn't valid</li><li class=''>is improper</li><li class=''>is profane</li></ul></li><li class=''>name is clearly fraudulent</li></ul>"
+
+test "ValidationError doesn't add 'base' to fullMessage when error is with multiple fields and multiple problems", ->
+  error = new Batman.ValidationError('base', {
+      email: ["isn't valid", "is improper", "is profane"],
+      name: ["is clearly fraudulent"]
+    })
+
+  s1 = error.get('fullMessage').split(' ')
+  s2 = "<ul class=''><li class=''>email<ul class=''><li class=''>isn't valid</li><li class=''>is improper</li><li class=''>is profane</li></ul></li><li class=''>name is clearly fraudulent</li></ul>".split(' ')
+  deepEqual s1, s2
+
+test "should support adding custom classes to the rendered error message", ->
+  Batman.ValidationError.UL_ERROR_CLASS = "foo"
+  Batman.ValidationError.LI_ERROR_CLASS = "bar"
+
+  error = new Batman.ValidationError('orderCustomer', {
+      email: ["isn't valid"],
+      name: ["is clearly fraudulent"]
+    })
+
+  s1 = error.get('fullMessage').split(' ')
+  s2 = "Order customer <ul class='foo'><li class='bar'>email isn't valid</li><li class='bar'>name is clearly fraudulent</li></ul>".split(' ')
+  deepEqual s1, s2

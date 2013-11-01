@@ -2,6 +2,22 @@
 
 class Batman.ValidationError extends Batman.Object
 
+  formatErrorObject = (message) ->
+    if Object.keys(message).length == 1
+      key = Object.keys(message)[0]
+      val = message[key]
+      if val instanceof Array
+        val = val.join (", ")
+
+      allFailures = key + " " + val
+    else
+      allFailures = "<ul class='#{ValidationError.UL_ERROR_CLASS}'>"
+      for key, val of message
+        allFailures += formatErrorsForField(key, val)
+      allFailures += "</ul>"
+
+    return allFailures
+
   formatErrorsForField = (key, errorValues) =>
     allFailures = ""
     if errorValues.length == 1
@@ -20,31 +36,16 @@ class Batman.ValidationError extends Batman.Object
   @LI_ERROR_CLASS = ""
 
   @accessor 'fullMessage', ->
+    if typeof @message == "string"
+      allFailures = @message
+    else if typeof @message == "object"
+      allFailures = formatErrorObject(@message)
+
     if @attribute == 'base'
-      if typeof @message == "string"
-        Batman.t 'errors.base.format',
-          message: @message
+      Batman.t 'errors.base.format',
+        message: allFailures
     else
-      if typeof @message == "string"
-        Batman.t 'errors.format',
-          attribute: Batman.helpers.humanize(@attribute)
-          message: @message
-      else if typeof @message == "object"
-        if Object.keys(@message).length == 1
-          key = Object.keys(@message)[0]
-          val = @message[key]
-          if val instanceof Array
-            val = val.join (", ")
-
-          allFailures = key + " " + val
-        else
-          allFailures = "<ul class='#{ValidationError.UL_ERROR_CLASS}'>"
-          for key, val of @message
-            allFailures += formatErrorsForField(key, val)
-          allFailures += "</ul>"
-
-
-        Batman.t 'errors.format',
-          attribute: Batman.helpers.humanize(@attribute)
-          message: allFailures
+      Batman.t 'errors.format',
+        attribute: Batman.helpers.humanize(@attribute)
+        message: allFailures
   constructor: (attribute, message) -> super({attribute, message})
