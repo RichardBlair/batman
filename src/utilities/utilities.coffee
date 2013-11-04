@@ -14,6 +14,9 @@ Batman.extend = (to, objects...) ->
 
 # `Batman.keys` returns an array of strings of the keys in an object
 Batman.keys = (object) ->
+  return keys if keys = Object.keys(object)
+
+  # fallback for IE8-
   keys = []
   for key of object
     keys.push key
