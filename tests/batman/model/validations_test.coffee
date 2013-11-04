@@ -512,13 +512,13 @@ test "ValidationError doesn't add 'base' to fullMessage when error is with multi
   deepEqual s1, s2
 
 test "should support adding custom classes to the rendered error message", ->
-  Batman.ValidationError.UL_ERROR_CLASS = "foo"
-  Batman.ValidationError.LI_ERROR_CLASS = "bar"
-
   error = new Batman.ValidationError('orderCustomer', {
       email: ["isn't valid"],
       name: ["is clearly fraudulent"]
     })
+
+  error.UL_ERROR_CLASS = "foo"
+  error.LI_ERROR_CLASS = "bar"
 
   s1 = error.get('fullMessage').split(' ')
   s2 = "Order customer <ul class='foo'><li class='bar'>email isn't valid</li><li class='bar'>name is clearly fraudulent</li></ul>".split(' ')

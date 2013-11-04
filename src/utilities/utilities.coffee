@@ -12,6 +12,14 @@ Batman.extend = (to, objects...) ->
   to[key] = value for key, value of object for object in objects
   to
 
+# `Batman.keys` returns an array of strings of the keys in an object
+Batman.keys = (object) ->
+  keys = []
+  for key of object
+    keys.push key
+
+  return keys
+
 # `Batman.mixin` applies every key from every argument after the first to the
 # first argument. If a mixin has an `initialize` method, it will be called in
 # the context of the `to` object, and it's key/values won't be applied.
